@@ -15,4 +15,4 @@ jobs:
       - name: Install Datree
         run: curl https://get.datree.io | /bin/bash
       - name: Run Datree's policy check
-        run: datree test .
+        run: datree test kubernetes.yml
