@@ -18,7 +18,7 @@ items:
       group: me.andidroid
     name: testwar
   spec:
-    replicas: 2
+    replicas: 1
     revisionHistoryLimit: 2
     selector:
       matchLabels:
