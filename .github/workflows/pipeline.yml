@@ -1,18 +1,30 @@
 name: CI
 on:
   push:
-    branches: [ master ]
+    branches: [kustomize]
   pull_request:
-    branches: [ master ]
+    branches: [kustomize]
 env:
-  DATREE_TOKEN: ${{ secrets.DATREE_TOKEN }} 
+  DATREE_TOKEN: ${{ secrets.DATREE_TOKEN }}
 jobs:
   k8s-policy-check:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Install kubectl and kustomize
+        uses: azure/setup-kubectl@v1
+      - name: Run kustomize
+        run: kubectl kustomize testwar/base/ > out.yaml
       - name: Install Datree
         run: curl https://get.datree.io | /bin/bash
+      - uses: actions/upload-artifact@v2
+        with:
+          name: kubernetes.yaml
+          path: out.yaml
       - name: Run Datree's policy check
-        run: datree test kubernetes.yml
+        run: datree test out.yaml > datree.log
+      - uses: actions/upload-artifact@v2
+        with:
+          name: datree.log
+          path: datree.log

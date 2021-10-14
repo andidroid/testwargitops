@@ -1,0 +1,117 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: testwar-deployment
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: testwar
+  template:
+    metadata:
+      labels:
+        app: testwar
+    spec:
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: andidroid-testwar
+          image: ghcr.io/andidroid/testwar:latest
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            privileged: false
+
+          ports:
+            - name: http
+              containerPort: 8080
+              # hostPort: 8080
+              protocol: TCP
+            - name: https
+              containerPort: 8443
+              # hostPort: 8443
+              protocol: TCP
+            - name: mgmt-http
+              containerPort: 9990
+              # hostPort: 9990
+              protocol: TCP
+            - name: mgmt-https
+              containerPort: 9993
+              protocol: TCP
+
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: mgmt-http
+            failureThreshold: 3
+            periodSeconds: 60
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: mgmt-http
+            failureThreshold: 3
+            periodSeconds: 10
+          startupProbe:
+            httpGet:
+              path: /health/started
+              port: mgmt-http
+            failureThreshold: 30
+            periodSeconds: 10
+
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+
+          env:
+            - name: POSTGRESQL_JNDI
+              valueFrom:
+                configMapKeyRef:
+                  name: testwar-configmap
+                  key: postgresql_jndi
+            - name: POSTGRESQL_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: testwar-configmap
+                  key: postgresql_host
+            - name: POSTGRESQL_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: testwar-configmap
+                  key: postgresql_port
+            - name: POSTGRESQL_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: testwar-configmap
+                  key: postgresql_database
+            - name: POSTGRESQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: username
+            - name: POSTGRESQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: password
+          volumeMounts:
+            - name: tls-secrets
+              readOnly: true
+              mountPath: /secrets
+      volumes:
+        - name: tls-secrets
+          secret:
+            secretName: tls-secrets-5fbbhm9k58
+            items:
+              - key: client.keystore
+                path: client.keystore
+              - key: server.keystore
+                path: server.keystore
+              - key: client.truststore
+                path: client.truststore
+              - key: server.truststore
+                path: server.truststore
+            defaultMode: 420

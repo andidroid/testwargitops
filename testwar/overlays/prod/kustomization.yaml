@@ -1,0 +1,19 @@
+namespace: test-prod
+resources:
+  - dev
+  - staging
+  - production
+namePrefix: cluster-prod-
+
+commonLabels:
+  app: testwar
+  version: 0.1.1
+  provider: git
+  group: me.andidroid
+  stage: prod
+
+  scm-url: https://github.com/andidroid/testwar.git
+  git-url: https://github.com/andidroid/testwar.git
+  scm-tag: HEAD
+  git-commit: 1bac6654a58669a34338a58b4fa0ae77541580a7
+  git-branch: kustomize
