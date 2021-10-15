@@ -104,7 +104,7 @@ spec:
       volumes:
         - name: tls-secrets
           secret:
-            secretName: tls-secrets-5fbbhm9k58
+            secretName: tls-secrets
             items:
               - key: client.keystore
                 path: client.keystore
