@@ -18,7 +18,7 @@ spec:
       containers:
         - name: andidroid-testwar
           image: ghcr.io/andidroid/testwar:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always #IfNotPresent
           securityContext:
             privileged: false
 
@@ -96,6 +96,11 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: postgres-secret
+                  key: password
+            - name: JGROUPS_CLUSTER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: jgroups-secret
                   key: password
           volumeMounts:
             - name: tls-secrets
