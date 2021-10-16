@@ -15,6 +15,7 @@ spec:
     spec:
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
+      serviceAccountName: jgroups-kubeping-service-account
       containers:
         - name: andidroid-testwar
           image: ghcr.io/andidroid/testwar:latest
@@ -102,6 +103,15 @@ spec:
                 secretKeyRef:
                   name: jgroups-secret
                   key: password
+            - name: KUBERNETES_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: KUBERNETES_LABELS
+              #valueFrom:
+              #  fieldRef:
+              #    fieldPath: metadata.labels.app
+              value: app=testwar
           volumeMounts:
             - name: tls-secrets
               readOnly: true

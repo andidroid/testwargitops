@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: artemis-deployment
+  labels:
+    app: artemis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: artemis
+  template:
+    metadata:
+      labels:
+        app: artemis
+    spec:
+      containers:
+        - name: artemis
+          image: andidroid/artemis-2.19.0-jdk11:latest
+          ports:
+            - containerPort: 9404
+              # name: jmx for prometheus metrics
+            - containerPort: 8161
+              # web server
+            - containerPort: 8163
+              # web server
+            - containerPort: 61616
+              # CORE,MQTT,AMQP,STOMP,HORNETQ,OPENWIRE
+            - containerPort: 5672
+              # AMQP
+            - containerPort: 5445
+              # HORNETQ
+          env:
+            - name: ARTEMIS_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: artemis-secret
+                  key: username
+            - name: ARTEMIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: artemis-secret
+                  key: password
+            - name: ENABLE_JMX_EXPORTER
+              value: "true"
+          volumeMounts:
+            - name: tls-secrets
+              readOnly: true
+              mountPath: /artemis/mybroker/etc/server.keystore
+              subPath: server.keystore
+            - name: tls-secrets
+              readOnly: true
+              mountPath: /artemis/mybroker/etc/server.truststore
+              subPath: server.truststore
+            - name: broker-volume
+              mountPath: /artemis/mybroker/etc/broker.xml
+              subPath: broker.xml
+            - name: bootstrap-volume
+              mountPath: /artemis/mybroker/etc/bootstrap.xml
+              subPath: bootstrap.xml
+
+      volumes:
+        - name: tls-secrets
+          secret:
+            secretName: tls-secrets
+            items:
+              - key: client.keystore
+                path: client.keystore
+              - key: server.keystore
+                path: server.keystore
+              - key: client.truststore
+                path: client.truststore
+              - key: server.truststore
+                path: server.truststore
+            defaultMode: 420
+        - name: broker-volume
+          configMap:
+            name: broker-configmap
+        - name: bootstrap-volume
+          configMap:
+            name: bootstrap-configmap

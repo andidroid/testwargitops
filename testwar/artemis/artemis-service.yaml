@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: artemis-service
+  labels:
+    app: artemis
+spec:
+  selector:
+    app: artemis
+  type: NodePort
+  ports:
+    - protocol: TCP
+      name: web-http
+      port: 8161
+      targetPort: 8161
+      nodePort: 32001
+    - protocol: TCP
+      name: web-https
+      port: 8163
+      targetPort: 8163
+      nodePort: 32003
+    - protocol: TCP
+      name: jms
+      port: 61616
+      targetPort: 61616
+      nodePort: 32000

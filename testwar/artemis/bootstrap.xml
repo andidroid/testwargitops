@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<broker xmlns="http://activemq.org/schema">
+  <jaas-security domain="activemq" />
+  <server configuration="file:/artemis/mybroker/etc/broker.xml" />
+  <!-- The web server is only bound to localhost by default -->
+
+  <!--
+  <web bind="http://localhost:8161" path="web">
+    <app url="activemq-branding" war="activemq-branding.war" />
+    <app url="artemis-plugin" war="artemis-plugin.war" />
+    <app url="console" war="console.war" />
+    <app url="metrics" war="artemis-prometheus-metrics-plugin-servlet-1.0.0.CR1-redhat-00018.war" />
+  </web>
+  -->
+  <web bind="https://localhost:8163" path="web" keyStorePath="${artemis.instance}/etc/server.keystore" keyStorePassword="password" trustStorePath="${artemis.instance}/etc/server.truststore" trustStorePassword="password">
+    <app url="activemq-branding" war="activemq-branding.war" />
+    <app url="artemis-plugin" war="artemis-plugin.war" />
+    <app url="console" war="console.war" />
+    <app url="metrics" war="artemis-prometheus-metrics-plugin-servlet-1.0.0.CR1-redhat-00018.war" />
+  </web>
+
+</broker>

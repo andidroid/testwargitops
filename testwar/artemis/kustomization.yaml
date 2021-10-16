@@ -1,0 +1,28 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: test
+
+# Example configuration for the webserver
+# at https://github.com/andidroid/testwar
+commonLabels:
+  app: artemis
+
+resources:
+  - artemis-deployment.yaml
+  - artemis-service.yaml
+
+configMapGenerator:
+  - name: bootstrap-configmap
+    files:
+      - bootstrap.xml
+  - name: broker-configmap
+    files:
+      - broker.xml
+
+generatorOptions:
+  disableNameSuffixHash: true
+  labels:
+    kustomize.generated.resources: generated-by-kustomize
+  annotations:
+    kustomize.generated.resources: generated-by-kustomize

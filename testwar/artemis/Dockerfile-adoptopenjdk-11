@@ -1,0 +1,53 @@
+# ActiveMQ Artemis
+FROM adoptopenjdk:11-jre-hotspot
+LABEL maintainer="andidroid"
+
+RUN mkdir /artemis
+WORKDIR /artemis
+
+# add user and group for artemis
+RUN groupadd -g 1000 -r artemis && useradd -r -u 1000 -g artemis artemis \
+    && apt-get -qq -o=Dpkg::Use-Pty=0 update && \
+    apt-get -qq -o=Dpkg::Use-Pty=0 install -y libaio1 && \
+    apt-get -qq -o=Dpkg::Use-Pty=0 install -y wget && \
+    apt-get -qq -o=Dpkg::Use-Pty=0 install -y unzip && \
+    rm -rf /var/lib/apt/lists/*
+
+USER root
+
+RUN wget -O "apache-artemis-2.19.0-bin.zip" "https://dlcdn.apache.org/activemq/activemq-artemis/2.19.0/apache-artemis-2.19.0-bin.zip"
+RUN unzip apache-artemis-2.19.0-bin.zip -d /artemis
+RUN rm apache-artemis-2.19.0-bin.zip
+
+RUN /artemis/apache-artemis-2.19.0/bin/artemis create --user artemis --password artemis --http-host 0.0.0.0 --require-login --relax-jolokia mybroker
+
+
+# USER artemis 
+
+# Web Server
+EXPOSE 8161 \
+    # HTTPS Web Console
+    8163 \
+    # JMX Exporter
+    9404 \
+    # Port for CORE,MQTT,AMQP,HORNETQ,STOMP,OPENWIRE
+    61616 \
+    # Port for HORNETQ,STOMP
+    5445 \
+    # Port for AMQP
+    5672 \
+    # Port for MQTT
+    1883 \
+    #Port for STOMP
+    61613
+
+RUN mkdir /artemis/mybroker/web
+RUN wget -O "/artemis/mybroker/web/artemis-prometheus-metrics-plugin-servlet-1.0.0.CR1-redhat-00018.war" "https://maven.repository.redhat.com/ga/org/apache/activemq/artemis-prometheus-metrics-plugin-servlet/1.0.0.CR1-redhat-00018/artemis-prometheus-metrics-plugin-servlet-1.0.0.CR1-redhat-00018.war"
+RUN wget -O "/artemis/mybroker/lib/artemis-prometheus-metrics-plugin-1.0.0.CR1-redhat-00018.jar" "https://maven.repository.redhat.com/ga/org/apache/activemq/artemis-prometheus-metrics-plugin/1.0.0.CR1-redhat-00018/artemis-prometheus-metrics-plugin-1.0.0.CR1-redhat-00018.jar"
+RUN wget -O "/artemis/mybroker/lib/netty-tcnative-2.0.44.Final.jar" "https://repo1.maven.org/maven2/io/netty/netty-tcnative/2.0.44.Final/netty-tcnative-2.0.44.Final.jar"
+RUN wget -O "/artemis/mybroker/lib/netty-tcnative-boringssl-static-2.0.44.Final.jar" "https://repo1.maven.org/maven2/io/netty/netty-tcnative-boringssl-static/2.0.44.Final/netty-tcnative-boringssl-static-2.0.44.Final.jar"
+
+# RUN wget -O "/artemis/mybroker/lib/jgroups-kubernetes-1.0.16.Final.jar" "https://repo1.maven.org/maven2/org/jgroups/kubernetes/jgroups-kubernetes/1.0.16.Final/jgroups-kubernetes-1.0.16.Final.jar"
+
+
+ENTRYPOINT ["/artemis/mybroker/bin/artemis", "run"]
