@@ -28,8 +28,15 @@ jobs:
         with:
           name: datree.log
           path: datree.log
+      - name: Run Kubeval validation out.yaml
+        uses: instrumenta/kubeval-action@master
+        with:
+          files: out.yaml
       - name: Run Kubeval validation
         uses: instrumenta/kubeval-action@master
+        continue-on-error: true
+        with:
+          files: testwar/.
           
   sonarcloud:
     name: SonarCloud
