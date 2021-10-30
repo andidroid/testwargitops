@@ -28,6 +28,9 @@ jobs:
         with:
           name: datree.log
           path: datree.log
+      - name: Run Kubeval validation
+        uses: instrumenta/kubeval-action@master
+          
   sonarcloud:
     name: SonarCloud
     runs-on: ubuntu-latest
