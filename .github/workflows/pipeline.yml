@@ -37,6 +37,11 @@ jobs:
         continue-on-error: true
         with:
           files: testwar/.
+      - name: Run OPA conftest
+        uses: instrumenta/conftest-action@master
+        with:
+          files: out.yaml
+          policy: github.com/instrumenta/policies.git//kubernetes
           
   sonarcloud:
     name: SonarCloud
