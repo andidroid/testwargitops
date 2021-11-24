@@ -41,7 +41,7 @@ jobs:
         uses: instrumenta/conftest-action@master
         with:
           files: out.yaml
-          policy: github.com/instrumenta/policies.git//kubernetes
+          # policy: github.com/instrumenta/policies.git//kubernetes
           
   sonarcloud:
     name: SonarCloud
