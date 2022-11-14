@@ -53,7 +53,7 @@ items:
             value: "postgres"
           - name: POSTGRESQL_DATABASE 
             value: "test"
-          image: ghcr.io/andidroid/testwar:0.1.1-SNAPSHOT
+          image: ghcr.io/andidroid/testwar:0.3.3-SNAPSHOT
           imagePullPolicy: IfNotPresent
           name: andidroid-testwar
           securityContext:
